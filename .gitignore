@@ -1,0 +1,7 @@
+.vscode
+wcic/__pycache__
+wcic/build
+wcic/dist
+wcic/include
+wcic/lib
+wcic/Scripts
