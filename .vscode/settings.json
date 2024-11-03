@@ -1,0 +1,18 @@
+{
+    "workbench.preferredDarkColorTheme": "After Dark",
+    "workbench.colorTheme": "After Dark",
+    "workbench.preferredHighContrastColorTheme": "After Dark",
+    "quokka.darkTheme.log.decorationAttachmentRenderOptions": {
+        
+        "border": null,
+        "borderColor": null,
+        "fontStyle": null,
+        "fontWeight": null,
+        "textDecoration": null,
+        "color": "rgba(86, 156, 214, 1)",
+        "backgroundColor": null,
+        "margin": "1.2em",
+        "width": null,
+        "height": null
+    }
+}
