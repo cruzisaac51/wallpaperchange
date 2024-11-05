@@ -17,6 +17,20 @@ collage2 = os.path.join(os.getenv('TEMP'), 'collage2.jpg')
 running = True
 time_remaining = 60  # Tiempo inicial en segundos
 
+# Función para parar el ciclo
+def stop_changing():
+    global running
+    running = False
+    print("itsupouse to stop runing",running)
+
+
+# Función para reanudar el ciclo
+def resume_changing():
+    global running
+    running = True
+    print("itsupouse to resume runing",running)
+
+
 # Cambiar el fondo de pantalla en Windows
 def set_wallpaper(image_path, monitor_index=0):
     ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 0)

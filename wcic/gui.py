@@ -2,16 +2,8 @@ import tkinter as tk
 from tkinter import filedialog
 import threading
 from wallpaper import *
-# Función para parar el ciclo
-def stop_changing():
-    global running
-    running = False
 
-# Función para reanudar el ciclo
-def resume_changing():
-    global running
-    running = True
-    
+
 def select_folder(folder_variable):
     selected_folder = filedialog.askdirectory()
     if selected_folder:

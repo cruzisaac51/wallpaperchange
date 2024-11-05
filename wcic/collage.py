@@ -108,40 +108,78 @@ def create_collage(image_folder, output_path, min_images=1, max_images=4, screen
             collage.paste(img, (i * img_width, 0))  # Pegar las imágenes de izquierda a derecha
 
     elif num_images == 4:
+
+        # Dimensiones iniciales para la cuadrícula (2x2)
         img_width = canvas_width // 2
         img_height = canvas_height // 2
+        occupied_area = 0  # Variable para almacenar el área ocupada por las imágenes
 
-        for i, img_path in enumerate(selected_images):
+        # Primero, calcular el área ocupada por las imágenes redimensionadas en cuadrícula
+        for img_path in selected_images:
             img = Image.open(img_path)
 
-            # Calcular la relación de aspecto
+            # Calcular la relación de aspecto y redimensionar
             img_ratio = img.width / img.height
-
-            # Redimensionar la imagen manteniendo la relación de aspecto
-            if img_ratio > 1:  # Imagen horizontal
+            if img_ratio > 1:
                 img = img.resize((img_width, int(img_width / img_ratio)))
-            else:  # Imagen vertical
+            else:
                 img = img.resize((int(img_height * img_ratio), img_height))
 
-            # Calcular las posiciones x e y para centrar la imagen
-            if i % 2 == 0:  # Imágenes en la izquierda
-                x_offset = 0
-            else:  # Imágenes en la derecha
-                x_offset = img_width
+            # Sumar el área ocupada por cada imagen
+            occupied_area += img.width * img.height
 
-            if i < 2:  # Imágenes en la fila superior
-                y_offset = 0
-            else:  # Imágenes en la fila inferior
-                y_offset = img_height
+        # Verificar si el área ocupada es menor a la mitad del canvas
+        canvas_area = canvas_width * canvas_height
+        if occupied_area < canvas_area / 2:
+            print("se supone es vertical ")
+            # Cambiar a disposición en columnas verticales (4 espacios)
+            img_width = canvas_width // 4
+            img_height = canvas_height  # Mantener la altura completa del canvas
+            for i, img_path in enumerate(selected_images):
+                img = Image.open(img_path)
 
-            # Calcular el desplazamiento para centrar la imagen
-            centered_x = x_offset + (img_width - img.width) // 2
-            centered_y = y_offset + (img_height - img.height) // 2
+                # Redimensionar para columnas verticales
+                img_ratio = img.width / img.height
+                if img_ratio > 1:
+                    img = img.resize((img_width, int(img_width / img_ratio)))
+                else:
+                    img = img.resize((int(img_height * img_ratio), img_height))
 
-            collage.paste(img, (centered_x, centered_y))
+                # Posicionar en columnas
+                x_offset = i * img_width
+                y_offset = (canvas_height - img.height) // 2
+                collage.paste(img, (x_offset, y_offset))
+        else:
+            print("se ocupa el normal")
+            # Si el área es suficiente, usar la disposición en cuadrícula (2x2)
+            for i, img_path in enumerate(selected_images):
+                img = Image.open(img_path)
+
+                # Redimensionar la imagen manteniendo la relación de aspecto
+                img_ratio = img.width / img.height
+                if img_ratio > 1:
+                    img = img.resize((img_width, int(img_width / img_ratio)))
+                else:
+                    img = img.resize((int(img_height * img_ratio), img_height))
+
+                # Posicionar en cuadrícula
+                if i % 2 == 0:  # Izquierda
+                    x_offset = 0
+                else:  # Derecha
+                    x_offset = img_width
+                if i < 2:  # Fila superior
+                    y_offset = 0
+                else:  # Fila inferior
+                    y_offset = img_height
+
+                # Centrar la imagen en su celda
+                centered_x = x_offset + (img_width - img.width) // 2
+                centered_y = y_offset + (img_height - img.height) // 2
+                collage.paste(img, (centered_x, centered_y))
 
         # Guardar el collage
         collage.save(output_path)
+
 
 
 
