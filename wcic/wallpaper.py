@@ -21,14 +21,13 @@ time_remaining = 60  # Tiempo inicial en segundos
 def stop_changing():
     global running
     running = False
-    print("itsupouse to stop runing",running)
-
+    print("El cambio de fondo se ha detenido")
 
 # Función para reanudar el ciclo
 def resume_changing():
     global running
     running = True
-    print("itsupouse to resume runing",running)
+    print("El cambio de fondo se ha reanudado")
 
 
 # Cambiar el fondo de pantalla en Windows
@@ -52,8 +51,12 @@ def change_wallpapers_in_background(label,timer_label):
                 # Restablecer el temporizador
         time_remaining = 60
 
-        # Temporizador para mostrar el tiempo restante
+         # Temporizador para mostrar el tiempo restante
         while time_remaining > 0:
+            if not running:
+                # Esperar hasta que se reanude
+                time.sleep(0.1)  # Pequeña espera para evitar uso excesivo de CPU
+                continue
             timer_label.config(text=f"Próximo cambio en: {time_remaining} segundos")
             time.sleep(1)
             time_remaining -= 1
