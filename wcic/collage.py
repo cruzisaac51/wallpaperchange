@@ -52,7 +52,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Parte derecha para rectángulo vertical dividido en 2 columnas de 6 espacios (35% del ancho)
         right_width = int(canvas_width * 0.35)
         cell_width = right_width // 2
-        cell_height = canvas_height // 6
+        cell_height = canvas_height // 4
 
         # Seleccionar 16 imágenes aleatorias sin repetirse
         selected_images = random.sample(images, 16)
@@ -74,7 +74,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
             collage.paste(img, (x_offset, y_offset))
 
         # Colocar las 12 imágenes en el área de columnas verticales a la derecha
-        for j in range(12):
+        for j in range(8):
             img = Image.open(right_images[j])
             img = img.resize((cell_width, cell_height))
             
