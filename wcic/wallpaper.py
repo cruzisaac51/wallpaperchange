@@ -94,11 +94,11 @@ def apply_fade_transition(image_path_1, image_path_2, duration=0.5):
     print(f"Dirección seleccionada: {direction}")
 
     # Asegurarse de que las imágenes tengan el mismo tamaño
-    if img1.shape != img2.shape:
-        img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
+    #if img1.shape != img2.shape:
+    #   img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
 
     # Ajustar el FPS para acelerar la transición
-    fps = 30  # Aumenta el FPS para una transición más fluida y rápida
+    fps = 40  # Aumenta el FPS para una transición más fluida y rápida
     num_frames = int(duration * fps)
 
     # Inicializar la variable de desplazamiento
@@ -129,7 +129,7 @@ def apply_fade_transition(image_path_1, image_path_2, duration=0.5):
             blend[shift:, :] = img2[:height-shift, :]
 
         # Establecer el fondo de pantalla (puedes modificar esto dependiendo de tu implementación)
-        temp_frame_path = 'temp_frame.jpg'
+        temp_frame_path = r'C:\mis_collages\temp_frame.jpg'
         cv2.imwrite(temp_frame_path, blend)
         set_wallpaper(temp_frame_path)
         
