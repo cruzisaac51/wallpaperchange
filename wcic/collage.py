@@ -41,9 +41,9 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
     max_row_height = 0
 
 
-
     if num_images == 0:
-        print("se usaron 0 imagenes en 12")
+        print("se usaron 0 imágenes en 12")
+        
         # Parte izquierda para 4 imágenes en una cuadrícula 2x2 (65% del ancho)
         left_width = int(canvas_width * 0.65)
         square_width = left_width // 2
@@ -54,13 +54,18 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         cell_width = right_width // 2
         cell_height = canvas_height // 6
 
-        # Asegurarse de tener al menos 4 imágenes para la parte izquierda
-        while len(selected_images) < 4:
-            selected_images.append(random.choice(images))
+        # Seleccionar 16 imágenes aleatorias sin repetirse
+        selected_images = random.sample(images, 16)
+
+        # Las primeras 4 imágenes se colocan en la parte izquierda (2x2 cuadrícula)
+        left_images = selected_images[:4]
+        
+        # Las siguientes 12 imágenes se colocan en la parte derecha (12 espacios en 2 columnas)
+        right_images = selected_images[4:]
 
         # Colocar las 4 imágenes en la parte izquierda (2x2 cuadrícula)
         for i in range(4):
-            img = Image.open(selected_images[i])
+            img = Image.open(left_images[i])
             img = img.resize((square_width, square_height))
             
             # Posicionar en cuadrícula
@@ -68,24 +73,16 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
             y_offset = (i // 2) * square_height
             collage.paste(img, (x_offset, y_offset))
 
-        # Seleccionar imágenes adicionales para el área de columnas verticales en el lado derecho
-        remaining_images = [img for img in images if img not in selected_images]
-        
-        # Asegurarse de tener suficientes imágenes para los 12 espacios en el área vertical
-        if len(remaining_images) < 12:
-            while len(remaining_images) < 12:
-                remaining_images.append(random.choice(remaining_images))
-        
-        # Colocar 12 imágenes en el área de columnas verticales a la derecha
+        # Colocar las 12 imágenes en el área de columnas verticales a la derecha
         for j in range(12):
-            img = Image.open(remaining_images[j])
+            img = Image.open(right_images[j])
             img = img.resize((cell_width, cell_height))
             
+            # Posicionar en las 12 celdas del lado derecho
             x_offset = left_width + (j % 2) * cell_width
             y_offset = (j // 2) * cell_height
             collage.paste(img, (x_offset, y_offset))
 
-        collage.save(output_path)
     # Si hay 1 imagen, aplicamos la lógica específica
     # Verificar si la imagen es horizontal o vertical
     elif num_images == 1:
@@ -176,7 +173,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
 
         # Verificar si el área ocupada es menor a la mitad del canvas
         canvas_area = canvas_width * canvas_height
-        if occupied_area < canvas_area / 2:
+        if occupied_area < canvas_area / 2 and occupied_area >= 5 * canvas_area / 12:
             print("se supone es vertical ")
             # Cambiar a disposición en columnas verticales (4 espacios)
             img_width = canvas_width // 4
