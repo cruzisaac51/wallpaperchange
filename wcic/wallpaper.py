@@ -98,7 +98,7 @@ def apply_fade_transition(image_path_1, image_path_2, duration=0.5):
     #   img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
 
     # Ajustar el FPS para acelerar la transición
-    fps = 40  # Aumenta el FPS para una transición más fluida y rápida
+    fps = 20  # Aumenta el FPS para una transición más fluida y rápida
     num_frames = int(duration * fps)
 
     # Inicializar la variable de desplazamiento
