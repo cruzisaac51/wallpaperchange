@@ -7,7 +7,6 @@ import numpy as np
 from PIL import Image
 from collage import create_collage
 
-
 # Ruta de las carpetas de imágenes
 folder1 = r"C:\Users\mayra\Pictures\morraschidas"
 folder2 = r"C:\Users\mayra\Pictures\monaschinas"
@@ -33,6 +32,7 @@ last_wallpaper_path = os.path.join(folder_path, 'last_wallpaper.jpg')
 running = True
 time_remaining = 60  # Tiempo inicial en segundos
 
+
 # Función para parar el ciclo
 def stop_changing():
     global running
@@ -49,18 +49,51 @@ def resume_changing():
 # Lista de collages pre-creados
 collages = [collage1, collage2, collage3, collage4]
 
+changing_active = True
+mix_mode = True
+def toggle_mix_mode(label):
+    global mix_mode
+    mix_mode = not mix_mode
+    mode = "Normal" if mix_mode else "Mix"
+    label.config(text=f"Modo actual: {mode}")
+    print(f"Modo cambiado a: {mode}")
+
+def toggle_changing(button):
+    global changing_active
+    changing_active = not changing_active
+    if changing_active:
+        button.config(text="⏸")
+        resume_changing()  # Llama a la función para reanudar el cambio
+    else:
+        button.config(text="▶")
+        stop_changing()  # Llama a la función para detener el cambio
+    print(f"Cambio automático {'activado' if changing_active else 'detenido'}")
+
 # Función para crear los collages iniciales
 def create_all_collages(label):
-    create_collage(folder1, collage1, label=label)
-    create_collage(folder2, collage2, label=label)
-    create_collage(folder1, collage3, label=label)
-    create_collage(folder2, collage4, label=label)
+    if mix_mode:
+        # Combinar imágenes de ambas carpetas
+        create_collage([folder1, folder2], collage1, label=label)
+        create_collage([folder1, folder2], collage2, label=label)
+        create_collage([folder1, folder2], collage3, label=label)
+        create_collage([folder1, folder2], collage4, label=label)
+    else:
+        # Usar imágenes de carpetas individuales
+        create_collage(folder1, collage1, label=label)
+        create_collage(folder2, collage2, label=label)
+        create_collage(folder1, collage3, label=label)
+        create_collage(folder2, collage4, label=label)
     
 # Función para crear nuevos collages
 def create_new_collages():
-    # Genera nuevos collages para reemplazar los que no se usan en la transición
-    create_collage(folder1, collage3, label="new")
-    create_collage(folder2, collage4, label="new")
+    if mix_mode:
+        # Modo mix: combinar imágenes de ambas carpetas
+        create_collage([folder1, folder2], collage3, label="new")
+        create_collage([folder1, folder2], collage4, label="new")
+    else:
+        # Modo normal: usar imágenes de carpetas individuales
+        create_collage(folder1, collage3, label="new")
+        create_collage(folder2, collage4, label="new")
 
 # Función para elegir dos collages aleatorios
 def select_random_collages():
@@ -199,13 +232,13 @@ def change_wallpapers_in_background(label, timer_label):
 
 def change_wallpapers(label):
     current_wallpaper = get_current_wallpaper()
-    create_all_collages(label)  # Crea todos los collages de antemano
+    create_all_collages(label)  # Crea todos los collages usando el modo actual
 
     # Seleccionar un collage aleatorio de los pre-creados
     new_collages = select_random_collages()
 
     # Realizar la transición entre el fondo actual y el nuevo
-    apply_fade_transition(current_wallpaper, new_collages[0], duration=2)  # Usa new_collages[0] y new_collages[1] como rutas individuales
+    apply_fade_transition(current_wallpaper, new_collages[0], duration=2)
 
     # Actualizar el fondo de pantalla
     set_wallpaper(new_collages[0], monitor_index=0)
@@ -213,5 +246,6 @@ def change_wallpapers(label):
     # Actualizar el último fondo
     global last_wallpaper_path
     last_wallpaper_path = new_collages[0]
+
 
 

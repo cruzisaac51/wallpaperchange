@@ -2,39 +2,48 @@ import os
 import random
 from PIL import Image
 # Crear un collage con imágenes seleccionadas
+
+mix_mode = False
+
 def create_collage(image_folder, output_path, min_images=0, max_images=4, screen_size=(1920, 1090), label=None):
     # Calcular el tamaño del canvas basado en la resolución de la pantalla
     canvas_width = int(screen_size[0])
     canvas_height = int(screen_size[1])
 
-    images = [os.path.join(image_folder, img) for img in os.listdir(image_folder) if img.endswith(('.jpg', '.png'))]
-    
+    #print(f"image_folders recibido: {image_folder} ({type(image_folder)})")
+    # Manejar múltiples carpetas
+    if isinstance(image_folder, list):
+        images = []
+        #print("mix")
+        for folder in image_folder:
+            images.extend([os.path.join(folder, img) for img in os.listdir(folder) if img.endswith(('.jpg', '.png'))])
+    else:
+        images = [os.path.join(image_folder, img) for img in os.listdir(image_folder) if img.endswith(('.jpg', '.png'))]
+        #print("noo mix")
+
     # Seleccionar un número aleatorio de imágenes entre min_images y max_images
     num_images = random.randint(min_images, max_images)
-    
+
     # Actualizar la etiqueta, si existe
     if label:
         label.config(text=f"Pegando {num_images} imágenes en el collage")
 
     # Asegurarse de que no se seleccionen más imágenes de las que hay disponibles
     num_images = min(num_images, len(images))
-    
-    # Limitar el número de imágenes a un máximo de 5
-    # num_images = min(num_images, max_images_per_row)
 
     selected_images = random.sample(images, num_images)
 
     # Seleccionar una imagen aleatoria para el fondo
     background_image_path = random.choice(images)
     background_image = Image.open(background_image_path)
-    
+
     # Redimensionar el fondo al tamaño del canvas
     background_image = background_image.resize((canvas_width, canvas_height))
 
     # Crear el canvas del collage usando la imagen de fondo
     collage = Image.new('RGB', (canvas_width, canvas_height))
     collage.paste(background_image, (0, 0))
-    
+
     # Variables para almacenar las posiciones donde se pegarán las imágenes
     x_offset = 0
     y_offset = 0
