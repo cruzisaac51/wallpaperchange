@@ -62,10 +62,10 @@ def toggle_changing(button):
     global changing_active
     changing_active = not changing_active
     if changing_active:
-        button.config(text="⏸")
+        button.config(text="‖")
         resume_changing()  # Llama a la función para reanudar el cambio
     else:
-        button.config(text="▶")
+        button.config(text="⏵")
         stop_changing()  # Llama a la función para detener el cambio
     print(f"Cambio automático {'activado' if changing_active else 'detenido'}")
 
