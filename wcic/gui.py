@@ -1,16 +1,24 @@
 import tkinter as tk
 from tkinter import filedialog
 import threading
+import varkeys
 from wallpaper import *
 from collage import *
 import customtkinter as ctk
+from varkeys import folder1, folder2
 
 
 def select_folder(folder_variable):
     selected_folder = filedialog.askdirectory()
     if selected_folder:
-        globals()[folder_variable] = selected_folder
+        # Asigna la ruta seleccionada a la variable correspondiente
+        if folder_variable == 'folder1':
+            varkeys.folder1 = selected_folder
+        elif folder_variable == 'folder2':
+            varkeys.folder2 = selected_folder
         print(f"{folder_variable} actualizado a: {selected_folder}")
+
+
 
 def toggle_folder_buttons():
     # Muestra u oculta los botones de selección de carpetas y cambia el tamaño de la ventana
@@ -18,12 +26,12 @@ def toggle_folder_buttons():
         folder1_button.pack_forget()
         folder2_button.pack_forget()
         toggle_button.config(text="▶ Seleccionar Carpetas")
-        root.geometry("250x250")  # Volver al tamaño pequeño
+        root.geometry("250x300")  # Volver al tamaño pequeño
     else:
         folder1_button.pack(pady=5)
         folder2_button.pack(pady=5)
         toggle_button.config(text="▼ Ocultar Carpetas")
-        root.geometry("250x300")  # Ampliar tamaño de la ventana
+        root.geometry("300x350")  # Ampliar tamaño de la ventana
 
 ctk.set_appearance_mode("dark")
 #ctk.set_default_color_theme("blue")
@@ -32,7 +40,7 @@ def create_interface():
 
     root = ctk.CTk()
     root.title("Wallpaper Changer")
-    root.geometry("250x250")
+    root.geometry("250x300")
 
     # Establecer ícono personalizado
     icon_path = "C:/Users/mayra/Documents/wallpaperchange/wcic/wp.ico"
@@ -49,6 +57,10 @@ def create_interface():
     timer_label = tk.Label(root, text="Próximo cambio en: 60 segundos", font=("Segoe UI", 10), fg="white", bg="#242323")
     timer_label.pack(pady=5)
 
+    # Crear el botón de favoritos
+    save_favorite_button = tk.Button(root, text="★", command=on_save_favorite, bg="#3b44ad", fg="white", font=("Segoe UI", 10, "bold"))
+    save_favorite_button.pack(pady=10)
+
     # Botones para seleccionar las carpetas, inicialmente ocultos
     folder1_button = tk.Button(root, text="Seleccionar Carpeta 1", command=lambda: select_folder('folder1'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
     folder2_button = tk.Button(root, text="Seleccionar Carpeta 2", command=lambda: select_folder('folder2'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
@@ -57,7 +69,7 @@ def create_interface():
     button_frame = tk.Frame(root, bg="#242323")
     button_frame.pack(pady=10)
 
-    change_button1 = tk.Button(button_frame, text="<<", fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
+    change_button1 = tk.Button(button_frame, text="<<", command=apply_previous_wallpaper, fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
     change_button1.grid(row=0, column=0, padx=5, pady=5)
 
     change_button = tk.Button(button_frame, text=">>", command=lambda: change_wallpapers(collage_label), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
