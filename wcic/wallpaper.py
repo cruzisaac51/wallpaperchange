@@ -23,9 +23,6 @@ running = True
 time_remaining = 60  # Tiempo inicial en segundos
 
 
-
-
-
 # Crear la carpeta si no existe
 if not os.path.exists(varkeys.favoritos_folder):
     os.makedirs(varkeys.favoritos_folder)
@@ -48,11 +45,13 @@ def save_used_collage(collage_path):
     #Guarda el collage utilizado en la carpeta de historial con un nombre único.
     # Obtener el siguiente nombre disponible
     files = os.listdir(varkeys.history_folder)
+    print("numeros guardados001", files)
     indices = [int(f.split('.')[0]) for f in files if f.split('.')[0].isdigit()]
     next_index = max(indices, default=0) + 1  # Encuentra el siguiente índice disponible
 
     # Generar el nuevo nombre del archivo
     new_filename = os.path.join(varkeys.history_folder, f"{next_index}.jpg")
+    print("cuando lo guarda aqui?",new_filename)
 
     # Copiar el archivo al historial
     shutil.copy(collage_path, new_filename)
@@ -197,88 +196,6 @@ def select_random_collages():
 
 
 
-
-# Función para la transición entre collages
-def apply_fade_between_collages(collage1, collage2, duration=0.5):
-    apply_fade_transition(collage1, collage2, duration)
-    set_wallpaper(collage2)
-
-def apply_fade_transition(image_path_1, image_path_2, duration=0.5):
-    img1 = cv2.imread(image_path_1)
-    img2 = cv2.imread(image_path_2)
-
-    if img1 is None:
-        print(f"Error: No se pudo cargar la imagen {image_path_1}")
-        return
-    if img2 is None:
-        print(f"Error: No se pudo cargar la imagen {image_path_2}")
-        return
-
-    # Lista de direcciones posibles
-    directions = ['right', 'left', 'up', 'down']
-    
-    # Seleccionar una dirección aleatoria
-    direction = random.choice(directions)
-    print(f"Dirección seleccionada: {direction}")
-
-    # Asegurarse de que las imágenes tengan el mismo tamaño
-    #if img1.shape != img2.shape:
-    #   img2 = cv2.resize(img2, (img1.shape[1], img1.shape[0]))
-
-    # Ajustar el FPS para acelerar la transición
-    fps = 20  # Aumenta el FPS para una transición más fluida y rápida
-    num_frames = int(duration * fps)
-
-    # Inicializar la variable de desplazamiento
-    height, width, _ = img1.shape
-    
-    for i in range(num_frames + 1):
-        alpha = i / num_frames  # Proporción de transición
-        blend = img1.copy()
-
-        if direction == 'right':
-            # Desplazar la imagen de izquierda a derecha
-            shift = int(i * width / num_frames)
-            blend[:, shift:] = img2[:, :width-shift]
-        
-        elif direction == 'left':
-            # Desplazar la imagen de derecha a izquierda
-            shift = int(i * width / num_frames)
-            blend[:, :width-shift] = img2[:, shift:]
-        
-        elif direction == 'up':
-            # Desplazar la imagen de abajo hacia arriba
-            shift = int(i * height / num_frames)
-            blend[:height-shift, :] = img2[shift:, :]
-        
-        elif direction == 'down':
-            # Desplazar la imagen de arriba hacia abajo
-            shift = int(i * height / num_frames)
-            blend[shift:, :] = img2[:height-shift, :]
-
-        # Establecer el fondo de pantalla (puedes modificar esto dependiendo de tu implementación)
-        temp_frame_path = r'C:\mis_collages\temp_frame.jpg'
-        cv2.imwrite(temp_frame_path, blend)
-        set_wallpaper(temp_frame_path)
-        
-        # Esperar entre frames
-        #time.sleep(1 / fps)
-
-    # Establecer la imagen final (cuando termina la transición)
-    set_wallpaper(image_path_2)
-
-def apply_transition():
-    # Elige dos collages aleatorios
-    current_collage, next_collage = select_random_collages()
-    
-    # Aplica la transición entre los dos collages seleccionados
-    apply_fade_transition(current_collage, next_collage, duration=2)
-    
-    # Después de la transición, crea nuevos collages para los no utilizados
-    # Los collages no utilizados en la transición serán reemplazados
-    create_new_collages()
-
-
 # Cambiar el fondo de pantalla en Windows
 def set_wallpaper(image_path, monitor_index=0):
     # Copiar el fondo actual a la ruta designada
@@ -287,6 +204,8 @@ def set_wallpaper(image_path, monitor_index=0):
 
 # Obtener el fondo de pantalla actual
 def get_current_wallpaper():
+    print("cual es el ultimo?",last_wallpaper_path)
+
     return last_wallpaper_path if os.path.exists(last_wallpaper_path) else collage1
 
 
@@ -298,10 +217,10 @@ def change_wallpapers_in_background(label, timer_label):
             create_all_collages(label)  # Crear todos los collages de antemano
             # Seleccionar el collage actual y uno nuevo aleatorio para la transición
             current_collage = get_current_wallpaper()  # El collage actual
+            print("cual es el ultimo1?",current_collage)
+            
             new_collages = select_random_collages()  # Seleccionamos dos collages aleatorios
 
-            # Realizar la transición entre los collages
-            apply_fade_between_collages(current_collage, new_collages[0], duration=2)  # Usamos new_collages[0]
 
             # Actualizar el fondo de pantalla
             set_wallpaper(new_collages[0])
@@ -323,20 +242,19 @@ def change_wallpapers_in_background(label, timer_label):
             time_remaining -= 1
 
         # Guardar el collage usado en el historial
-        add_to_last_used(new_collages[0])
+        #add_to_last_used(new_collages[0])
 
 
 
 def change_wallpapers(label):
     global last_used_wallpapers
     current_wallpaper = get_current_wallpaper()
+    print("cual es el ultimo?",current_wallpaper)
+    
     create_all_collages(label)  # Crea todos los collages usando el modo actual
 
     # Seleccionar un collage aleatorio de los pre-creados
     new_collages = select_random_collages()
-
-    # Realizar la transición entre el fondo actual y el nuevo
-    apply_fade_transition(current_wallpaper, new_collages[0], duration=2)
 
     # Actualizar el fondo de pantalla
     set_wallpaper(new_collages[0], monitor_index=0)
