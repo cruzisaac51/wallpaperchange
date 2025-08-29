@@ -14,12 +14,23 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
     # Manejar múltiples carpetas
     if isinstance(image_folder, list):
         images = []
-        #print("mix")
         for folder in image_folder:
-            images.extend([os.path.join(folder, img) for img in os.listdir(folder) if img.endswith(('.jpg', '.png'))])
+            images.extend([
+                os.path.join(folder, img)
+                for img in os.listdir(folder)
+                if img.lower().endswith(('.jpg', '.jpeg', '.png'))
+            ])
     else:
-        images = [os.path.join(image_folder, img) for img in os.listdir(image_folder) if img.endswith(('.jpg', '.png'))]
-        #print("noo mix")
+        images = [
+            os.path.join(image_folder, img)
+            for img in os.listdir(image_folder)
+            if img.lower().endswith(('.jpg', '.jpeg', '.png'))
+        ]
+
+    if not images:
+        print(f"⚠️ No se encontraron imágenes válidas en {image_folder}")
+        return  # o podrías poner una imagen por defecto en lugar de romper
+
 
     # Seleccionar un número aleatorio de imágenes entre min_images y max_images
     num_images = random.randint(min_images, max_images)
