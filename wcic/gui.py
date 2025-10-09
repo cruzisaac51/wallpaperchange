@@ -36,7 +36,7 @@ def toggle_folder_buttons():
 ctk.set_appearance_mode("dark")
 #ctk.set_default_color_theme("blue")
 def create_interface():
-    global folder1_button, folder2_button, toggle_button, mix_button, root
+    global folder1_button, folder2_button, toggle_button, mix_button, root, black_button
 
     root = ctk.CTk()
     root.title("Wallpaper Changer")
@@ -84,6 +84,10 @@ def create_interface():
     # Botón para mostrar/ocultar botones de selección de carpetas
     toggle_button = tk.Button(root, text="⏵ Seleccionar Carpetas", command=toggle_folder_buttons, fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
     toggle_button.pack(pady=5)
+
+    black_button = tk.Button(button_frame,text="Negro",command=set_black_wallpaper,fg="white",bg="#3b44ad",font=("Segoe UI", 10, "bold"))
+    black_button.grid(row=1, column=2, padx=5, pady=5)
+
 
     # Iniciar un hilo para cambiar wallpapers en segundo plano
     thread = threading.Thread(target=change_wallpapers_in_background, args=(collage_label, timer_label), daemon=True)

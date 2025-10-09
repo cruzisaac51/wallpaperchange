@@ -1,6 +1,6 @@
 # Ruta de las carpetas de imágenes
-folder1 = r"C:\Users\mayra\Pictures\LILIAMIAMOR"
-folder2 = r"C:\Users\mayra\Pictures\LILIAMIAMOR"
+folder1 = r"C:\Users\mayra\Pictures"
+folder2 = r"C:\Users\mayra\Pictures"
 
 
 

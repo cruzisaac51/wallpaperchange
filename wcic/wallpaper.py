@@ -124,6 +124,27 @@ def on_save_favorite():
     else:
         print("No se ha usado ningún fondo aún. No se puede guardar en favoritos.")
 
+def set_black_wallpaper():
+    """Crea una imagen negra del tamaño de la pantalla y la establece como fondo."""
+    try:
+        # Obtener tamaño de pantalla
+        user32 = ctypes.windll.user32
+        screen_width = user32.GetSystemMetrics(0)
+        screen_height = user32.GetSystemMetrics(1)
+
+        # Crear imagen negra
+        black_image = Image.new("RGB", (screen_width, screen_height), (0, 0, 0))
+
+        # Guardarla en una ruta temporal
+        black_wallpaper_path = os.path.join(os.getenv('TEMP'), 'black_wallpaper.jpg')
+        black_image.save(black_wallpaper_path)
+
+        # Aplicar como fondo
+        set_wallpaper(black_wallpaper_path)
+        print(f"Fondo negro aplicado correctamente ({screen_width}x{screen_height}).")
+
+    except Exception as e:
+        print(f"⚠️ Error al establecer fondo negro: {e}")
 
 
 # Función para parar el ciclo

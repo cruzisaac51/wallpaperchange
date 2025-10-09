@@ -10,22 +10,21 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
     canvas_width = int(screen_size[0])
     canvas_height = int(screen_size[1])
 
-    #print(f"image_folders recibido: {image_folder} ({type(image_folder)})")
+    print(f"image_folders recibido: {image_folder} ({type(image_folder)})")
     # Manejar múltiples carpetas
+    images = []
     if isinstance(image_folder, list):
-        images = []
         for folder in image_folder:
-            images.extend([
-                os.path.join(folder, img)
-                for img in os.listdir(folder)
-                if img.lower().endswith(('.jpg', '.jpeg', '.png'))
-            ])
+            for root, _, files in os.walk(folder):  # ← Recorre todas las subcarpetas
+                for file in files:
+                    if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                        images.append(os.path.join(root, file))
     else:
-        images = [
-            os.path.join(image_folder, img)
-            for img in os.listdir(image_folder)
-            if img.lower().endswith(('.jpg', '.jpeg', '.png'))
-        ]
+        for root, _, files in os.walk(image_folder):  # ← También en caso de solo una carpeta
+            for file in files:
+                if file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    images.append(os.path.join(root, file))
+
 
     if not images:
         print(f"⚠️ No se encontraron imágenes válidas en {image_folder}")
