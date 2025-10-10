@@ -1,6 +1,6 @@
 import os
 import random
-from PIL import Image
+from PIL import Image, ImageOps
 # Crear un collage con imágenes seleccionadas
 
 mix_mode = False
@@ -46,6 +46,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
     # Seleccionar una imagen aleatoria para el fondo
     background_image_path = random.choice(images)
     background_image = Image.open(background_image_path)
+    background_image = ImageOps.exif_transpose(background_image)
 
     # Redimensionar el fondo al tamaño del canvas
     background_image = background_image.resize((canvas_width, canvas_height))
@@ -85,7 +86,8 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Colocar las 4 imágenes en la parte izquierda (2x2 cuadrícula)
         for i in range(4):
             img = Image.open(left_images[i])
-            img = img.resize((square_width, square_height))
+            img = ImageOps.exif_transpose(img)
+            img = img.resize((square_width, square_height), Image.LANCZOS)
             
             # Posicionar en cuadrícula
             x_offset = (i % 2) * square_width
@@ -95,7 +97,8 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Colocar las 12 imágenes en el área de columnas verticales a la derecha
         for j in range(8):
             img = Image.open(right_images[j])
-            img = img.resize((cell_width, cell_height))
+            img = ImageOps.exif_transpose(img)
+            img = img.resize((cell_width, cell_height), Image.LANCZOS)
             
             # Posicionar en las 12 celdas del lado derecho
             x_offset = left_width + (j % 2) * cell_width
@@ -115,6 +118,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
             img_path = selected_images[0]  # Si no hay válidas, usamos la seleccionada original
 
         img = Image.open(img_path)
+        img = ImageOps.exif_transpose(img)
         img_ratio = img.width / img.height
 
         # Verificar si la imagen es horizontal o vertical
@@ -138,7 +142,7 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
                 img_height = int(img_width / img_ratio)
 
         # Redimensionar la imagen
-        img = img.resize((img_width, img_height))
+        img = img.resize((img_width, img_height), Image.LANCZOS)
 
         # Calcular los offsets para centrar la imagen
         x_offset = (canvas_width - img_width) // 2  # Centrar horizontalmente
@@ -156,7 +160,8 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Pegar cada imagen
         for i in range(2):
             img = Image.open(selected_images[i])
-            img = img.resize((img_width, img_height))
+            img = ImageOps.exif_transpose(img)
+            img = img.resize((img_width, img_height), Image.LANCZOS)
             collage.paste(img, (i * img_width, 0))  # Pegar una imagen a la derecha de la otra
     
     elif num_images == 3:
@@ -166,7 +171,8 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Pegar cada imagen en una columna
         for i in range(3):
             img = Image.open(selected_images[i])
-            img = img.resize((img_width, img_height))
+            img = ImageOps.exif_transpose(img)
+            img = img.resize((img_width, img_height), Image.LANCZOS)
             collage.paste(img, (i * img_width, 0))  # Pegar las imágenes de izquierda a derecha
 
     elif num_images == 4:
@@ -179,13 +185,14 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
         # Primero, calcular el área ocupada por las imágenes redimensionadas en cuadrícula
         for img_path in selected_images:
             img = Image.open(img_path)
+            img = ImageOps.exif_transpose(img)
 
             # Calcular la relación de aspecto y redimensionar
             img_ratio = img.width / img.height
             if img_ratio > 1:
-                img = img.resize((img_width, int(img_width / img_ratio)))
+                img = img.resize((img_width, int(img_width / img_ratio)), Image.LANCZOS)
             else:
-                img = img.resize((int(img_height * img_ratio), img_height))
+                img = img.resize((int(img_height * img_ratio), img_height), Image.LANCZOS)
 
             # Sumar el área ocupada por cada imagen
             occupied_area += img.width * img.height
@@ -199,13 +206,14 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
             img_height = canvas_height  # Mantener la altura completa del canvas
             for i, img_path in enumerate(selected_images):
                 img = Image.open(img_path)
+                img = ImageOps.exif_transpose(img)
 
                 # Redimensionar para columnas verticales
                 img_ratio = img.width / img.height
                 if img_ratio > 1:
-                    img = img.resize((img_width, int(img_width / img_ratio)))
+                    img = img.resize((img_width, int(img_width / img_ratio)), Image.LANCZOS)
                 else:
-                    img = img.resize((int(img_height * img_ratio), img_height))
+                    img = img.resize((int(img_height * img_ratio), img_height), Image.LANCZOS)
 
                 # Posicionar en columnas
                 x_offset = i * img_width
@@ -216,13 +224,14 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
             # Si el área es suficiente, usar la disposición en cuadrícula (2x2)
             for i, img_path in enumerate(selected_images):
                 img = Image.open(img_path)
+                img = ImageOps.exif_transpose(img)
 
                 # Redimensionar la imagen manteniendo la relación de aspecto
                 img_ratio = img.width / img.height
                 if img_ratio > 1:
-                    img = img.resize((img_width, int(img_width / img_ratio)))
+                    img = img.resize((img_width, int(img_width / img_ratio)), Image.LANCZOS)
                 else:
-                    img = img.resize((int(img_height * img_ratio), img_height))
+                    img = img.resize((int(img_height * img_ratio), img_height), Image.LANCZOS)
 
                 # Posicionar en cuadrícula
                 if i % 2 == 0:  # Izquierda
@@ -258,11 +267,12 @@ def create_collage(image_folder, output_path, min_images=0, max_images=4, screen
 
         for img_path in selected_images:
             img = Image.open(img_path)
+            img = ImageOps.exif_transpose(img)
             img_ratio = img.width / img.height
 
             # Calcular el alto de la imagen manteniendo su relación de aspecto
             img_height = int(img_width / img_ratio)
-            img = img.resize((img_width, img_height))
+            img = img.resize((img_width, img_height), Image.LANCZOS)
 
             # Verificar si la imagen cabe en la fila actual o si el ancho es menor que el límite mínimo
             if x_offset + img_width >= canvas_width:
