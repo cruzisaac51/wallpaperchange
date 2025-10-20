@@ -1,3 +1,5 @@
+import os
+
 # Ruta de las carpetas de imágenes
 folder1 = r"C:\Users\mayra\Pictures"
 folder2 = r"C:\Users\mayra\Pictures"
@@ -14,3 +16,6 @@ history_folder = r"C:\mis_collages\history"
 
 # Ruta de la carpeta de favoritos
 favoritos_folder = r"C:\mis_collages\favoritos"
+
+#RECENT_FILE = os.path.join(os.getenv('APPDATA'), 'wallpaperchanger_recent.json')
+RECENT_FILE = os.path.join(folder_path, "recent_folders.json")

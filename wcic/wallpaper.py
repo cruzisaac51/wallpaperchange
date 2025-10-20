@@ -6,6 +6,7 @@ import cv2
 import shutil
 import numpy as np
 import varkeys
+import json
 from PIL import Image
 from collage import create_collage
 
@@ -144,8 +145,36 @@ def set_black_wallpaper():
         print(f"Fondo negro aplicado correctamente ({screen_width}x{screen_height}).")
 
     except Exception as e:
-        print(f"⚠️ Error al establecer fondo negro: {e}")
+        print(f" Error al establecer fondo negro: {e}")
 
+def load_recent_folders():
+    """Carga las carpetas recientes desde un archivo JSON."""
+    print('seesta usando esta fucnion si onooooooooooooooooooo')
+    if os.path.exists(varkeys.RECENT_FILE):
+        try:
+            with open(varkeys.RECENT_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except:
+            return []
+    return []
+
+def save_recent_folder(path):
+    print('se esta usando laotraaaafucnion si o noooooo')
+    """Guarda una nueva carpeta en la lista de recientes (máx. 10)."""
+    recent = load_recent_folders()
+    path = os.path.normpath(path)
+
+    # Si ya existe, la mueve al inicio
+    if path in recent:
+        recent.remove(path)
+
+    recent.insert(0, path)
+
+    # Limitar a 10 entradas
+    recent = recent[:10]
+
+    with open(varkeys.RECENT_FILE, 'w', encoding='utf-8') as f:
+        json.dump(recent, f, ensure_ascii=False, indent=2)
 
 # Función para parar el ciclo
 def stop_changing():

@@ -1,11 +1,17 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
+import os
 import threading
 import varkeys
 from wallpaper import *
 from collage import *
 import customtkinter as ctk
 from varkeys import folder1, folder2
+
+
+recent_folders = load_recent_folders()
+
 
 
 def select_folder(folder_variable):
@@ -17,6 +23,11 @@ def select_folder(folder_variable):
         elif folder_variable == 'folder2':
             varkeys.folder2 = selected_folder
         print(f"{folder_variable} actualizado a: {selected_folder}")
+
+        save_recent_folder(selected_folder)
+        print(f"Carpeta guardada en recientes: {selected_folder}")
+        dropdown['values'] = load_recent_folders()
+
 
 
 
@@ -31,20 +42,38 @@ def toggle_folder_buttons():
         folder1_button.pack(pady=5)
         folder2_button.pack(pady=5)
         toggle_button.config(text="▼ Ocultar Carpetas")
-        root.geometry("300x350")  # Ampliar tamaño de la ventana
+        # Actualiza el layout y ajusta el tamaño automáticamente
+        root.update_idletasks()
+        root.geometry(root.geometry())
+         
+
+        
+def on_select_folder(event=None):
+    selected = selected_folder.get()
+    if selected and os.path.exists(selected):
+        # Cuando se selecciona una carpeta del dropdown,
+        # se actualizan ambas carpetas al mismo tiempo
+        varkeys.folder1 = selected
+        varkeys.folder2 = selected
+        print(f" Ambas carpetas actualizadas desde dropdown: {selected}")
+    else:
+        print("Carpeta no válida o no existe")
+
 
 ctk.set_appearance_mode("dark")
 #ctk.set_default_color_theme("blue")
 def create_interface():
-    global folder1_button, folder2_button, toggle_button, mix_button, root, black_button
+    global folder1_button, folder2_button, toggle_button, mix_button, root, black_button, dropdown, selected_folder
 
     root = ctk.CTk()
     root.title("Wallpaper Changer")
-    root.geometry("250x300")
+    root.minsize(250, 300)
 
     # Establecer ícono personalizado
     icon_path = "C:/Users/mayra/Documents/wallpaperchange/wcic/wp.ico"
     root.iconbitmap(icon_path)
+
+    selected_folder = tk.StringVar()
 
     status_label = tk.Label(root, text="Modo actual: Mix", font=("Segoe UI", 15, "bold"), fg="white", bg="#242323")
     status_label.pack(pady=5)
@@ -62,8 +91,8 @@ def create_interface():
     save_favorite_button.pack(pady=10)
 
     # Botones para seleccionar las carpetas, inicialmente ocultos
-    folder1_button = tk.Button(root, text="Seleccionar Carpeta 1", command=lambda: select_folder('folder1'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
-    folder2_button = tk.Button(root, text="Seleccionar Carpeta 2", command=lambda: select_folder('folder2'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
+    # folder1_button = tk.Button(root, text="Seleccionar Carpeta 1", command=lambda: select_folder('folder1'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
+    #folder2_button = tk.Button(root, text="Seleccionar Carpeta 2", command=lambda: select_folder('folder2'), fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
 
     # Crear un contenedor (Frame) para los botones en la misma fila
     button_frame = tk.Frame(root, bg="#242323")
@@ -85,8 +114,26 @@ def create_interface():
     toggle_button = tk.Button(root, text="⏵ Seleccionar Carpetas", command=toggle_folder_buttons, fg="white", bg="#3b44ad", font=("Segoe UI", 10, "bold"))
     toggle_button.pack(pady=5)
 
+    folder_frame = tk.Frame(root, bg="#242323")
+    folder_frame.pack()
+
+    folder1_button = tk.Button(folder_frame, text="Seleccionar Carpeta 1", command=lambda: select_folder('folder1'))
+    folder2_button = tk.Button(folder_frame, text="Seleccionar Carpeta 2", command=lambda: select_folder('folder2'))
+
+
     black_button = tk.Button(button_frame,text="Negro",command=set_black_wallpaper,fg="white",bg="#3b44ad",font=("Segoe UI", 10, "bold"))
     black_button.grid(row=1, column=2, padx=5, pady=5)
+
+
+
+    recent_label = tk.Label(root, text="Carpetas recientes:", bg="#242323", fg="white", font=("Segoe UI", 9))
+    recent_label.pack(pady=(10, 0))
+
+    dropdown = ttk.Combobox(root, textvariable=selected_folder, values=recent_folders, width=60, state="readonly")
+    dropdown.pack(pady=5)
+    dropdown.bind("<<ComboboxSelected>>", on_select_folder)
+
+
 
 
     # Iniciar un hilo para cambiar wallpapers en segundo plano
