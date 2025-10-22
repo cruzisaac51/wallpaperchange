@@ -137,7 +137,19 @@ def create_interface():
 
 
     # Iniciar un hilo para cambiar wallpapers en segundo plano
-    thread = threading.Thread(target=change_wallpapers_in_background, args=(collage_label, timer_label), daemon=True)
-    thread.start()
+    wallpaper_thread = threading.Thread(
+        target=change_wallpapers_in_background,
+        args=(collage_label, timer_label),
+        daemon=True
+    )
+    wallpaper_thread.start()
+
+    # Iniciar hilo para detectar bloqueo/desbloqueo de pantalla
+    monitor_thread = threading.Thread(
+        target=monitor_screen_lock,
+        args=(stop_changing, resume_changing),
+        daemon=True
+    )
+    monitor_thread.start()
 
     root.mainloop()

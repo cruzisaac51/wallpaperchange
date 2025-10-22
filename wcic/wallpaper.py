@@ -4,6 +4,7 @@ import random
 import time
 import cv2
 import shutil
+import threading
 import numpy as np
 import varkeys
 import json
@@ -22,6 +23,7 @@ last_wallpaper_path = os.path.join(varkeys.folder_path, 'last_wallpaper.jpg')
 # Variable de control para pausar/reanudar el cambio de fondo
 running = True
 time_remaining = 60  # Tiempo inicial en segundos
+last_state = None
 
 
 # Crear la carpeta si no existe
@@ -176,6 +178,30 @@ def save_recent_folder(path):
     with open(varkeys.RECENT_FILE, 'w', encoding='utf-8') as f:
         json.dump(recent, f, ensure_ascii=False, indent=2)
 
+def is_workstation_locked():
+    """Verifica si la sesión está bloqueada usando la API de Windows."""
+    user32 = ctypes.windll.User32
+    hDesktop = user32.OpenDesktopW("Default", 0, False, 0x0100)
+    result = user32.SwitchDesktop(hDesktop)
+    user32.CloseDesktop(hDesktop)
+    return not result  # True = bloqueada, False = desbloqueada
+
+
+def monitor_screen_lock(pause_callback, resume_callback, interval=2):
+    """Monitorea cada cierto tiempo si la pantalla está bloqueada o desbloqueada."""
+    global last_state
+    while True:
+        locked = is_workstation_locked()
+        if locked and last_state != "locked":
+            print("Pantalla bloqueada — pausando cambios de fondo")
+            pause_callback()
+            last_state = "locked"
+        elif not locked and last_state != "unlocked":
+            print("Pantalla desbloqueada — reanudando cambios de fondo")
+            resume_callback()
+            last_state = "unlocked"
+        time.sleep(interval)
+
 # Función para parar el ciclo
 def stop_changing():
     global running
@@ -262,37 +288,43 @@ def get_current_wallpaper():
 # Ciclo para cambiar los collages automáticamente cada minuto
 def change_wallpapers_in_background(label, timer_label):
     global running, time_remaining, last_used_wallpapers
+    INTERVALO = 60
+    time_remaining = INTERVALO
+
     while True:
         if running:
-            create_all_collages(label)  # Crear todos los collages de antemano
-            # Seleccionar el collage actual y uno nuevo aleatorio para la transición
-            current_collage = get_current_wallpaper()  # El collage actual
-            print("cual es el ultimo1?",current_collage)
-            
-            new_collages = select_random_collages()  # Seleccionamos dos collages aleatorios
+            if time_remaining <= 0:
+                create_all_collages(label)  # Crear todos los collages de antemano
+                # Seleccionar el collage actual y uno nuevo aleatorio para la transición
+                current_collage = get_current_wallpaper()  # El collage actual
+                print("cual es el ultimo1?",current_collage)
+                
+                new_collages = select_random_collages()  # Seleccionamos dos collages aleatorios
 
 
-            # Actualizar el fondo de pantalla
-            set_wallpaper(new_collages[0])
+                # Actualizar el fondo de pantalla
+                set_wallpaper(new_collages[0])
 
-            # Guardar el nuevo fondo en la lista de últimos usados
-            add_to_last_used(new_collages[0])
+                # Guardar el nuevo fondo en la lista de últimos usados
+                add_to_last_used(new_collages[0])
 
-            # Restablecer el temporizador
-            time_remaining = 60
+                # Restablecer el temporizador
+                time_remaining = INTERVALO
 
-        # Temporizador para mostrar el tiempo restante
-        while time_remaining > 0:
-            if not running:
-                # Esperar hasta que se reanude
-                time.sleep(0.1)  # Pequeña espera para evitar uso excesivo de CPU
-                continue
+            # Actualizar texto del temporizador
             timer_label.config(text=f"Próximo cambio en: {time_remaining} segundos")
-            time.sleep(1)
             time_remaining -= 1
 
-        # Guardar el collage usado en el historial
-        #add_to_last_used(new_collages[0])
+        else:
+            # Si está pausado, mostrar mensaje y no reducir tiempo
+            timer_label.config(text="Cambio pausado")
+
+        time.sleep(1)
+    # Espera de 1 segundo, pero revisando running cada 0.1s
+        for _ in range(1):
+            if not running:
+                break
+            time.sleep(1)
 
 
 
