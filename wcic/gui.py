@@ -145,11 +145,12 @@ def create_interface():
     wallpaper_thread.start()
 
     # Iniciar hilo para detectar bloqueo/desbloqueo de pantalla
-    monitor_thread = threading.Thread(
-        target=monitor_screen_lock,
-        args=(stop_changing, resume_changing),
-        daemon=True
-    )
-    monitor_thread.start()
+    # monitor_thread = threading.Thread(
+    #     target=monitor_screen_lock,
+    #     args=(stop_changing, resume_changing),
+    #     daemon=True
+    # )
+    # monitor_thread.start()
 
+    root.after(1000, lambda: change_wallpapers(collage_label))
     root.mainloop()

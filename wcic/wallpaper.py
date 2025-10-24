@@ -1,4 +1,5 @@
 import ctypes
+from ctypes import wintypes
 import os
 import random
 import time
@@ -178,29 +179,29 @@ def save_recent_folder(path):
     with open(varkeys.RECENT_FILE, 'w', encoding='utf-8') as f:
         json.dump(recent, f, ensure_ascii=False, indent=2)
 
-def is_workstation_locked():
-    """Verifica si la sesión está bloqueada usando la API de Windows."""
-    user32 = ctypes.windll.User32
-    hDesktop = user32.OpenDesktopW("Default", 0, False, 0x0100)
-    result = user32.SwitchDesktop(hDesktop)
-    user32.CloseDesktop(hDesktop)
-    return not result  # True = bloqueada, False = desbloqueada
 
+# def is_workstation_locked():
+#     """Verifica si la sesión está bloqueada usando la API de Windows."""
+#     user32 = ctypes.windll.User32
+#     hDesktop = user32.OpenDesktopW("Default", 0, False, 0x0100)
+#     result = user32.SwitchDesktop(hDesktop)
+#     user32.CloseDesktop(hDesktop)
+#     return not result  # True = bloqueada, False = desbloqueada
 
-def monitor_screen_lock(pause_callback, resume_callback, interval=2):
-    """Monitorea cada cierto tiempo si la pantalla está bloqueada o desbloqueada."""
-    global last_state
-    while True:
-        locked = is_workstation_locked()
-        if locked and last_state != "locked":
-            print("Pantalla bloqueada — pausando cambios de fondo")
-            pause_callback()
-            last_state = "locked"
-        elif not locked and last_state != "unlocked":
-            print("Pantalla desbloqueada — reanudando cambios de fondo")
-            resume_callback()
-            last_state = "unlocked"
-        time.sleep(interval)
+# def monitor_screen_lock(pause_callback, resume_callback, interval=2):
+#     """Monitorea cada cierto tiempo si la pantalla está bloqueada o desbloqueada."""
+#     global last_state
+#     while True:
+#         locked = is_workstation_locked()
+#         if locked and last_state != "locked":
+#             print("Pantalla bloqueada — pausando cambios de fondo")
+#             pause_callback()
+#             last_state = "locked"
+#         elif not locked and last_state != "unlocked":
+#             print("Pantalla desbloqueada — reanudando cambios de fondo")
+#             resume_callback()
+#             last_state = "unlocked"
+#         time.sleep(interval)
 
 # Función para parar el ciclo
 def stop_changing():
